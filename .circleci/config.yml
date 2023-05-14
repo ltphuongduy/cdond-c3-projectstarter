@@ -160,7 +160,6 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
-      - aws_configure_credential
       - run: 
           name: Install tar
           command: yum install -y tar
