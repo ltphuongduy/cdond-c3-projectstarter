@@ -4,19 +4,18 @@ commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
-      id:
-        type: string
       when:
-        type: string   
+        type: string
     steps:
       - run:
-          name: Destroy environments
-          when: on_fail
+          name: Clear S3 and destroy environment
+          when: << parameters.when >>
           command: |
-            aws s3 rm "s3://udapeople-<< parameters.id >>" --recursive
-            aws cloudformation delete-stack --stack-name "udapeople-frontend-<< parameters.id >>"
-            aws cloudformation delete-stack --stack-name "udapeople-backend-<< parameters.id >>"
-            echo "done"
+            aws s3 rm "s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --recursive
+            aws cloudformation delete-stack --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
+            aws cloudformation delete-stack --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
+            echo "done cleanup"
+
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
     parameters:
@@ -30,7 +29,7 @@ commands:
           # Add when this will run
           command: |
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            export SUCCESS=$(curl --insecure  https://kvdb.io/7631EfVEMJ6GBr6zssg4RU/migration_<< parameters.id >>)
+            export SUCCESS=$(curl --insecure  https://kvdb.io/WXvu7CYLMyQtWtBEvGwHQ2/migration_<< parameters.id >>)
             echo $SUCCESS
             pwd
             if [[ $SUCCESS -eq 1 ]];
@@ -40,7 +39,6 @@ commands:
               npm run migrations:revert
             fi
           when: << parameters.when >>
-
 
 jobs:
   build-frontend:
@@ -88,7 +86,7 @@ jobs:
             cd frontend
             npm install
             npm run test
-                
+
   test-backend:
     docker:
       - image: circleci/node:13.8.0
@@ -131,40 +129,43 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Dependencies installation
+          name: Install required dependencies
           command: yum install -y tar gzip unzip
       - run:
           name: Ensure back-end infrastructure exists
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
-              --tags project=udapeople \
               --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+              --parameter-overrides ID=${CIRCLE_WORKFLOW_ID:0:7} \
+              --tags project=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
+
       - run:
           name: Ensure front-end infrastructure exist
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/frontend.yml \
-              --tags project=udapeople \
               --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+              --parameter-overrides ID=${CIRCLE_WORKFLOW_ID:0:7} \
+              --tags project=udapeople
+
       - run:
           name: Add back-end ip to ansible inventory
           command: |
             aws ec2 describe-instances \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --filters "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --output text >> .circleci/ansible/inventory
             cat .circleci/ansible/inventory
+
       - persist_to_workspace:
           root: .
           paths:
             - .circleci/ansible/inventory
-      - destroy-environment:
-          id: ${CIRCLE_WORKFLOW_ID:0:7}
-          when: on_fail
 
+      # Here's where you will add some code to rollback on failure
+      - destroy-environment:
+          when: on_fail
 
 workflows:
   default:
