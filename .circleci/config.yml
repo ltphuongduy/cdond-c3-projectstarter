@@ -143,6 +143,39 @@ jobs:
       - destroy-environment:
           when: on_fail
 
+  configure-infrastructure:
+    docker:
+      - image: python:3.9.0-alpine
+    steps:
+      # Checkout code from git
+      - checkout
+      # Add ssh keys with fingerprint
+      - add_ssh_keys:
+          fingerprints: ["95:18:ab:26:de:ef:25:cc:8b:62:f3:08:c2:01:33:b1"]
+      # attach workspace
+      - attach_workspace:
+          at: .
+      - run:
+          name: Install required dependencies
+          command: |
+            apk add tar unzip curl
+            apk add --no-cache aws-cli
+            aws --version
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update ansible
+            ansible --version
+      - run:
+          name: Configure server
+          command: |
+            cd ./.circleci/ansible/
+            ansible-playbook -i inventory configure-server.yml
+      # Here's where you will add some code to rollback on failure
+      - destroy-environment:
+          when: on_fail
+
+
 workflows:
   default:
     jobs:
@@ -161,3 +194,5 @@ workflows:
           filters:
             branches:
               only: [master]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
