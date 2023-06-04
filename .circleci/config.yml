@@ -289,7 +289,7 @@ jobs:
       - checkout
       # Add ssh keys with fingerprint
       - add_ssh_keys:
-          fingerprints: ["95:18:ab:26:de:ef:25:cc:8b:62:f3:08:c2:01:33:b1"]
+          fingerprints: ["e8:20:8f:d7:e0:44:e4:e6:b5:59:86:8c:0b:38:23:4d:1f:71:93:76"]
       # attach workspace
       - attach_workspace:
           at: .
@@ -300,26 +300,6 @@ jobs:
             ansible --version
             pip install awscli
             aws --version
-      - run: 
-          name: Save all db varibles in env file 
-          command: |
-            ls
-            echo ENVIROMENT=production > "backend/.env"
-            echo NODE_ENV=production > "backend/.env"
-            echo TYPEORM_CONNECTION=$TYPEORM_CONNECTION >> "backend/.env"
-            echo TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR >> "backend/.env"
-            echo TYPEORM_ENTITIES=$TYPEORM_ENTITIES >> "backend/.env"
-            echo TYPEORM_MIGRATIONS=$TYPEORM_MIGRATIONS >> "backend/.env"
-            echo TYPEORM_HOST=$TYPEORM_HOST >> "backend/.env"
-            echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/.env"
-            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
-            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
-            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"
-            cd backend
-            echo "Backend ls: -------"
-            ls
-            echo "Backend .env ls: -------"
-            cat .env
       - run:
           name: Deploy backend
           command: |
