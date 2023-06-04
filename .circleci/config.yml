@@ -175,6 +175,47 @@ jobs:
       - destroy-environment:
           when: on_fail
 
+  run-migrations:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - run:
+          name: Install AWS CLI dependencies
+          command: |
+            mkdir temp
+            cd ./temp
+            apt-get update && apt-get install -yy less
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+            cd ..
+      - run:
+          name: Run migrations
+          command: |
+            cd backend
+            npm install
+            touch temp
+            npm run migrations > temp
+            cat temp
+      - run:
+          name: Send migration results to kvdb.io
+          command: |
+            cd backend
+            ls
+            cat temp
+            if grep -q "No migrations are pending" temp
+            then
+              echo "stash success status to kvdb.io"
+              echo "https://kvdb.io/J8eDbBk9s6sskLtb1ymQc7/migration_${CIRCLE_WORKFLOW_ID:0:7}"
+              curl -k -d '1' https://kvdb.io/J8eDbBk9s6sskLtb1ymQc7/migration_${CIRCLE_WORKFLOW_ID:0:7}
+            else
+              echo "stash fail status to kvdb.io"
+              echo "https://kvdb.io/J8eDbBk9s6sskLtb1ymQc7/migration_${CIRCLE_WORKFLOW_ID:0:7}"
+              curl -k -d '0' https://kvdb.io/J8eDbBk9s6sskLtb1ymQc7/migration_${CIRCLE_WORKFLOW_ID:0:7}
+            fi
+      - destroy-environment:
+          when: on_fail
 
 workflows:
   default:
@@ -196,3 +237,5 @@ workflows:
               only: [master]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
+      - run-migrations:
+          requires: [configure-infrastructure]
