@@ -217,6 +217,7 @@ jobs:
             cat inventory.txt
             pip3 install --upgrade pip
             pip3 install --upgrade paramiko
+            ansible-playbook -i inventory.txt configure-server.yml
       # Here's where you will add some code to rollback on failure
       - destroy-environment  
 
@@ -430,9 +431,9 @@ workflows:
             branches:
               only: [master]
       - configure-infrastructure:
-          requires: [deploy-infrastructure]
+        #  requires: [deploy-infrastructure]
       - run-migrations:
-          requires: [configure-infrastructure]
+        #  requires: [configure-infrastructure]
       - deploy-frontend:
           requires: [run-migrations]
       - deploy-backend:
@@ -442,4 +443,4 @@ workflows:
       - cloudfront-update:
           requires: [smoke-test]
       - cleanup:
-          requires: [cloudfront-update]
+       #   requires: [cloudfront-update]
