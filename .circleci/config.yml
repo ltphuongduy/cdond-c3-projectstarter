@@ -203,7 +203,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprinters:
-            - "e8:20:8f:d7:e0:44:e4:e6:b5:59:86:8c:0b:38:23:4d:1f:71:93:76"
+            - "43:70:e2:81:f0:a0:7d:65:45:b3:d0:bf:db:81:9f:c7:96:2a:e5:75"
       - run:
           name: Install dependencies
           command: |
