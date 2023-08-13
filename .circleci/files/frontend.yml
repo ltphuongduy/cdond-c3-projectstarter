@@ -8,15 +8,17 @@ Parameters:
 
 Resources:
   WebsiteBucket:
-    Type: AWS::S3::Bucket
+    Type: 'AWS::S3::Bucket'
     Properties:
       BucketName: !Sub "duyltp-230813-${ID}"
+      AccessControl: PublicRead
       WebsiteConfiguration:
         IndexDocument: index.html
         ErrorDocument: 404.html
-  
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
   WebsiteBucketPolicy:
-    Type: AWS::S3::BucketPolicy
+    Type: 'AWS::S3::BucketPolicy'
     Properties:
       Bucket: !Ref 'WebsiteBucket'
       PolicyDocument:
@@ -24,7 +26,7 @@ Resources:
         - Sid: PublicReadForGetBucketObjects
           Effect: Allow
           Principal: '*'
-          Action: s3:GetObject
+          Action: 's3:GetObject'
           Resource: !Join ['', ['arn:aws:s3:::', !Ref 'WebsiteBucket', /*]]
 
 Outputs:
