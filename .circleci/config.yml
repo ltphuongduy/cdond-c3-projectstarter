@@ -217,7 +217,6 @@ jobs:
             cat inventory.txt
             pip3 install --upgrade pip
             pip3 install --upgrade paramiko
-            ansible-playbook -i inventory.txt configure-server.yml
       # Here's where you will add some code to rollback on failure
       - destroy-environment  
 
