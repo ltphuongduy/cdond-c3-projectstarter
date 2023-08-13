@@ -1,5 +1,3 @@
----
-
 - name: "configuration play." 
   hosts: web
   user: ubuntu
@@ -26,6 +24,17 @@
     - name: install python for Ansible.
       raw: apt -y update && apt install -y python-minimal
       when: check_python.rc != 0
+
+    - name: "Upgrade paramiko library"
+      become: yes
+      apt:
+        name: python3-pip
+        state: present
+    - name: "Upgrade paramiko"
+      become: yes
+      pip:
+        name: paramiko
+        state: latest
 
   # Get the environment variables from CircleCI and add to the EC2 instance
   environment:
