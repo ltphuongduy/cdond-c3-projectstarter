@@ -215,8 +215,8 @@ jobs:
           command: |
             cd .circleci/ansible
             cat inventory.txt
-            pip3 install --upgrade pip
-            pip3 install --upgrade paramiko
+            sudo apt-get update
+            sudo apt-get install build-essential
             ansible-playbook -i inventory.txt configure-server.yml
       # Here's where you will add some code to rollback on failure
       - destroy-environment  
