@@ -195,7 +195,7 @@ jobs:
 
   configure-infrastructure:
     docker:
-      - image: python:3.11-rc-alpine
+      - image: python:3.6-alpine
     steps:
       # Checkout code from git
       # Add ssh keys with fingerprint
@@ -297,7 +297,7 @@ jobs:
                     
   deploy-backend:
     docker:
-      - image: python:3.11-rc-alpine
+      - image: python:3.6-alpine
     steps:
       # Checkout code from git
       # Add ssh keys with fingerprint
@@ -332,7 +332,7 @@ jobs:
 
   smoke-test:
     docker:
-      - image: python:3.11-rc-alpine 
+      - image: python:3.6-alpine
     steps:
       - checkout
       - run:
