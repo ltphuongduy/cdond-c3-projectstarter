@@ -211,7 +211,7 @@ jobs:
       - checkout
       - install_ansible
       - add_ssh_keys:
-          fingerprinters:
+          fingerprints:
             - "6c:8d:6e:b1:74:1e:6b:14:ee:13:35:fb:b1:7b:54:7b"
       - run:
           name: Install dependencies
@@ -312,7 +312,7 @@ jobs:
       # attach workspace
       - checkout
       - add_ssh_keys:
-          fingerprinters:
+          fingerprints:
             - "6c:8d:6e:b1:74:1e:6b:14:ee:13:35:fb:b1:7b:54:7b"
       - run:
           name: Install dependencies
