@@ -52,7 +52,17 @@ commands:
               npm run migrations:revert
               exit 1
             fi
-            
+  install_ansible:
+    description: Install Ansible
+    steps:
+      - run:
+          name: Install Ansible
+          command: |
+            sudo apt update
+            sudo apt install software-properties-common -y
+            sudo add-apt-repository --yes --update ppa:ansible/ansible
+            sudo apt install ansible -y
+
 jobs:
   build-frontend:
     docker:
@@ -201,6 +211,7 @@ jobs:
       # Add ssh keys with fingerprint
       # attach workspace
       - checkout
+      - install_ansible
       - add_ssh_keys:
           fingerprinters:
             - "6c:8d:6e:b1:74:1e:6b:14:ee:13:35:fb:b1:7b:54:7b"
