@@ -58,10 +58,8 @@ commands:
       - run:
           name: Install Ansible
           command: |
-            apt update
-            apt install software-properties-common -y
-            add-apt-repository --yes --update ppa:ansible/ansible
-            apt install ansible -y
+            apk update
+            apk add ansible
 
 jobs:
   build-frontend:
