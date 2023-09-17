@@ -203,29 +203,32 @@ jobs:
 
   configure-infrastructure:
     docker:
-      - image: python:3.6-alpine
+      - image: python:3.9.0-alpine
     steps:
       # Checkout code from git
-      # Add ssh keys with fingerprint
-      # attach workspace
       - checkout
-      - install_ansible
+      # Add ssh keys with fingerprint
       - add_ssh_keys:
-          fingerprints:
-            - "7c:1a:a7:50:c5:81:b6:f7:e4:18:7d:f7:61:a5:c1:77"
+            fingerprints: ["7c:1a:a7:50:c5:81:b6:f7:e4:18:7d:f7:61:a5:c1:77"]
+      # attach workspace
+      - attach_workspace:
+          at: .
+      - run:
+          name: Install required dependencies
+          command: |
+            apk add tar unzip curl
+            apk add --no-cache aws-cli
+            aws --version
       - run:
           name: Install dependencies
           command: |
             apk add --update ansible
-            apk add build-base
-      - attach_workspace: 
-          at: ~/
+            ansible --version
       - run:
           name: Configure server
           command: |
-            cd .circleci/ansible
-            cat inventory.txt
-            ansible-playbook -i inventory.txt configure-server.yml
+            cd ./.circleci/ansible/
+            ansible-playbook -i inventory configure-server.yml
       # Here's where you will add some code to rollback on failure
       - destroy-environment  
 
